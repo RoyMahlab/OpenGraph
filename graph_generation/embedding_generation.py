@@ -15,7 +15,7 @@ def load_item_list(item_file, entity_file, item_num):
         with open(item_file, 'rb') as fs:
             item_list = pickle.load(fs)
     return item_list
-
+ 
 descs = {
     'data_name': 'gen_data_venues',
     'scenario_desc': 'venue rating platform like yelp',
@@ -59,7 +59,8 @@ agent = DataGenAgent()
 embedding_dict = dict()
 for i, item in enumerate(item_list):
     log('{idx} / {tot}'.format(idx=i, tot=len(item_list)))
-    embedding = agent.openai_embedding(item)
+    # embedding = agent.openai_embedding(item)
+    embedding = agent.gemma_embedding(item)
     embedding_dict[item] = embedding
 with open(embed_file, 'wb') as fs:
     pickle.dump(embedding_dict, fs)

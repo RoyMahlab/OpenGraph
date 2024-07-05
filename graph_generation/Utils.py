@@ -7,7 +7,9 @@ import Exp_Utils.TimeLogger as logger
 from Exp_Utils.TimeLogger import log
 from Exp_Utils.Emailer import SendMail
 import time
-
+from transformers import AutoTokenizer, AutoModel
+import torch
+torch.manual_seed(0)
 openai.api_key = "xx-xxxxxx"
 
 class DataGenAgent:
@@ -15,6 +17,23 @@ class DataGenAgent:
         super(DataGenAgent, self).__init__()
         self.token_num = 0
         self.encoding = tiktoken.encoding_for_model('gpt-3.5-turbo')
+
+        
+        self.model_id = "google/gemma-2-9b"
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_id)
+        self.model = AutoModel.from_pretrained(
+            pretrained_model_name_or_path=self.model_id,
+            token="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",
+            device_map="auto",
+            torch_dtype=torch.bfloat16
+        )
+        
+        
+    def gemma_embedding(self, message):
+        input_ids = self.tokenizer(message, return_tensors="pt").to("cuda")
+        model_outputs = self.model(**input_ids).last_hidden_state
+        embeddings = torch.prod(model_outputs.squeeze(),dim=0)
+        return embeddings.detach().cpu().to(torch.float32).numpy() # numpy vector of size [3584]
     
     def openai_embedding(self, message):
         try:

@@ -112,7 +112,8 @@ class HumanItemRelationGeneration(DataGenAgent):
         print('Embedding not found!')
         print(text)
         exit()
-        embedding = self.openai_embedding(text)
+        # embedding = self.openai_embedding(text)
+        embedding = self.gemma_embedding(text)
         self.text_embedding_dict[text] = embedding
         return embedding
     
