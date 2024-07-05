@@ -5,7 +5,9 @@ import openai
 import time
 import tiktoken
 import json
-
+import transformers
+import torch
+torch.manual_seed(0)
 openai.api_key = "xxxxxx"
 class DataGenAgent:
     def __init__(self, initial_entity, scenario_desc, depth):
@@ -18,9 +20,41 @@ class DataGenAgent:
         self.token_num = 0
         self.total_num = 0
         self.depth = depth
+        
+        
+        self.model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
+        self.pipeline = transformers.pipeline(
+            "text-generation",
+            model=self.model_id,
+            model_kwargs={"torch_dtype": torch.bfloat16},
+            token="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",
+            device_map="auto",
+        )
+        self.terminators = [
+            self.pipeline.tokenizer.eos_token_id,
+            self.pipeline.tokenizer.convert_tokens_to_ids("<|eot_id|>")
+        ]
 
+    def llama(self, message):
+        messages = [
+            {"role": "user", "content": message},
+        ]
+        completion = self.pipeline(
+            messages,
+            max_new_tokens=256,
+            eos_token_id=self.terminators,
+            do_sample=True,
+            temperature=0.6,
+            top_p=0.9,
+        )
+        #TODO: do something with token num
+        time.sleep(1)
+        # print(f"From llama tokenizer: \n {len(self.pipeline.tokenizer.encode(json.dumps(message)))}")
+        self.token_num += len(self.pipeline.tokenizer.encode(json.dumps(message)))
+        return completion[0]['generated_text'][-1]['content']
+    
     def openai(self, message):
-        try:
+        try: 
             completion = openai.ChatCompletion.create(
                 model='gpt-3.5-turbo-1106',
                 messages=[
@@ -39,7 +73,8 @@ class DataGenAgent:
     def check_if_concrete(self, entity_stack):
         entity_name = ', '.join(entity_stack)
         text = 'In the context of {scenario_desc}, is {entity_name} a concrete instance or category that can hardly be divided into sub-categories with prominent differences? Response should starts with "True" or "False".'.format(scenario_desc=self.scenario_desc, entity_name=entity_name)
-        answer = self.openai(text)
+        answer = self.llama(text)
+        # answer = self.openai(text)
         # print('answer to {entity_name}: {answer}'.format(entity_name=entity_name, answer=answer))
         if answer.startswith('True'):
             print('Concrete Check True')
@@ -52,7 +87,8 @@ class DataGenAgent:
         else:
             text = 'List all distinct sub-categories of {entity_name} within the {prefix} category in the context of {scenario_desc}, ensuring a finer level of granularity. The sub-categories should not overlap with each other. And a sub-category should be a smaller subset of {entity_name}. Directly present the list EXACTLY following the form: "sub-category a, sub-category b, sub-category c, ..." without other words, format symbols, new lines, serial numbers.'.format(entity_name=entity_name, prefix=prefix, scenario_desc=self.scenario_desc)
             # text = 'List all distinct sub-categories of {entity_name} within the {prefix} category in the context of {scenario_desc}, ensuring a finer level of granularity. The sub-categories should not overlap with each other. Present the list exactly following the form: "sub-category a, sub-category b, sub-category c, ...". There should be no serial number, new lines or other format symbols. Separate each pair of sub-categories with a comma.'.format(entity_name=entity_name, prefix=prefix, scenario_desc=self.scenario_desc)
-        answer = self.openai(text)
+        answer = self.llama(text)
+        # answer = self.openai(text)
         return list(map(lambda x: x.strip().strip(',').strip('.'), answer.split(',')))
 
     def decompose_category(self, entity_stack, depth):
