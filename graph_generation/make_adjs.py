@@ -20,8 +20,8 @@ parser = argparse.ArgumentParser(description='Dataset information')
 parser.add_argument('--gen_iter', default=0, type=int, help='maximum generation iteration')
 args = parser.parse_args()
 
-
-
+# root_ = '/home/roymahlab/projects/OpenGraph2/graph_generation/' if os.path.relpath(os.getcwd()) != '.' else ''
+# file_root = root_ + 'gen_results/datasets/{data_name}/'.format(data_name=descs['data_name'])
 file_root = 'gen_results/datasets/{data_name}/'.format(data_name=descs['data_name'])
 fuse_file_path = file_root + 'res/interaction_fuse_iter-{iter}.pkl'.format(iter=args.gen_iter)
 
@@ -42,9 +42,9 @@ def get_all_bases():
 
 def fuse_bases():
     if os.path.exists(fuse_file_path):
-        print('Fused interaction file exists! REUSING!')
-        print('This may happen inadverdently!')
-        exit()
+        # print('Fused interaction file exists! REUSING!')
+        # print('This may happen inadverdently!')
+        # exit()
         with open(fuse_file_path, 'rb') as fs:
             interactions = pickle.load(fs)
             return interactions
