@@ -1,21 +1,15 @@
 products, Books, Fiction
 products, Books, Non-fiction
-products, Books, Mystery
-products, Books, Science Fiction
-products, Books, Romance
-products, Books, Fantasy
-products, Books, Thriller
-products, Books, Biography
-products, Books, History
-products, Books, Children's Books
+products, Books, Children's books
+products, Books, Textbooks
 products, Books, Self-help
-products, Books, Cookbook
-products, Books, Art
-products, Books, Travel
-products, Books, Science
-products, Books, Religion
-products, Books, Reference
+products, Books, Travel guides
+products, Books, Cookbooks
 products, Books, Poetry
-products, Books, Graphic Novels
-products, Books, Horror
-products, Books, Young Adult
+products, Books, Graphic novels
+products, Books, Young adult
+products, Books, Biography
+products, Books, Reference books
+products, Books, History
+products, Books, Science fiction
+products, Books, Fantasy
