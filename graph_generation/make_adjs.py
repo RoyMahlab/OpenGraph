@@ -5,10 +5,12 @@ from scipy.sparse import coo_matrix
 import numpy as np
 import random
 import networkx as nx
-
-descs = {
-    'data_name': 'gen_data_ecommerce',
-}
+from pathlib import Path
+from Utils import check_and_create_dirs
+from Utils import descs
+# descs = {
+#     'data_name': 'gen_data_political_opinions',
+# }
 params = {
     'itmfusion': True,
     'kcore': 0,
@@ -20,8 +22,7 @@ parser = argparse.ArgumentParser(description='Dataset information')
 parser.add_argument('--gen_iter', default=0, type=int, help='maximum generation iteration')
 args = parser.parse_args()
 
-# root_ = '/home/roymahlab/projects/OpenGraph2/graph_generation/' if os.path.relpath(os.getcwd()) != '.' else ''
-# file_root = root_ + 'gen_results/datasets/{data_name}/'.format(data_name=descs['data_name'])
+
 file_root = 'gen_results/datasets/{data_name}/'.format(data_name=descs['data_name'])
 fuse_file_path = file_root + 'res/interaction_fuse_iter-{iter}.pkl'.format(iter=args.gen_iter)
 
@@ -170,6 +171,9 @@ rows, cols, i_mapp, u_num, i_num = make_id_map(interactions)#, lambda x: x>20)
 if params['kcore'] != 1:
     rows, cols, i_mapp, u_num, i_num = k_core(rows, cols, i_mapp, i_num, params['kcore'])
 print('U NUM', u_num, 'I Num', i_num, 'E Num', len(rows))
+
+check_and_create_dirs(file_root + 'res')
+    
 with open(file_root + 'res/iter-{gen_iter}_imap.pkl'.format(gen_iter=args.gen_iter), 'wb+') as fs:
     pickle.dump(i_mapp, fs)
 trn_mat, val_mat, tst_mat = data_split(rows, cols, u_num, i_num)

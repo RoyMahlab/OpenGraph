@@ -8,6 +8,7 @@ from Exp_Utils.Emailer import SendMail
 import numpy as np
 from scipy.stats import norm
 import copy
+from Utils import descs
 
 class HumanItemRelationGeneration(DataGenAgent):
     def __init__(self, item_list, length_sampler, descs, hyperparams, text_embedding_dict=None):
@@ -321,13 +322,13 @@ def load_embedding_dict(embed_file):
 
 if __name__ == '__main__':
     # parameter specification
-    descs = {
-        'data_name': 'gen_data_ecommerce',
-        'scenario_desc': 'e-commerce platform like Amazon',
-        'human_role': 'user',
-        'interaction_verb': 'interact',
-        'initial_entity': 'products',
-    }
+    # descs = {
+    #     'data_name': 'gen_data_political_opinions',
+    #     'scenario_desc': "people's political ideologies",
+    #     'human_role': 'user',
+    #     'interaction_verb': 'interact',
+    #     'initial_entity': 'ideology',
+    # }
     hyperparams = {
         'seed_num': 6,
         'item_num': 1,#200000,

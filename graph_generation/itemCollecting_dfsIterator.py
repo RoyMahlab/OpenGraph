@@ -5,8 +5,8 @@ import openai
 import time
 import tiktoken
 import json
-
-openai.api_key = "xxxxxx"
+from Utils import descs, check_and_create_dirs
+openai.api_key = ""
 class DataGenAgent:
     def __init__(self, initial_entity, scenario_desc, depth):
         super(DataGenAgent, self).__init__()
@@ -66,6 +66,7 @@ class DataGenAgent:
         concrete_entities = []
         sub_entities = self.category_enum(prefix, entity_stack[-1])
         print('sub-categories of {entity_name} includes:'.format(entity_name=entity_name), sub_entities)
+        check_and_create_dirs("gen_results/tem")
         for sub_entity in sub_entities:
             if sub_entity in entity_name:
                 continue
@@ -84,9 +85,9 @@ class DataGenAgent:
     def run(self):
         return self.decompose_category([self.initial_entity], 1)
 
-entity = 'products'
-scenario = 'e-commerce platform like Amazon'
-depth = 3
+# entity = 'products'
+# scenario = 'e-commerce platform like Amazon'
+# depth = 3
 
 # entity = 'movies'
 # scenario = 'movie rating platform'
@@ -103,18 +104,19 @@ depth = 3
 
 # entity = 'deep learning papers'
 # scenario = 'published paper list of top AI conferences'
-# depth = 6
+# depth = 3
 
 # entity = 'ideology'
 # scenario = "people's political ideologies"
-# depth = 4
+# depth = 3
 
 # entity = 'jobs'
 # scenario = "people's occupations and professions"
 # depth = 5
-
-agent = DataGenAgent(entity, scenario, depth)
+check_and_create_dirs(f"gen_results/datasets/{descs["data_name"]}/res")
+agent = DataGenAgent(descs["initial_entity"], descs["scenario_desc"],descs["depth"])
 nodes = agent.run()
-with open('gen_results/{entity}_{scenario}.txt'.format(entity=entity, scenario=scenario), 'w+') as fs:
+with open('gen_results/{entity}_{scenario}.txt'.format(entity=descs["initial_entity"], 
+                                                       scenario=descs["scenario_desc"]), 'w+') as fs:
     for node in nodes:
         fs.write(node+'\n')

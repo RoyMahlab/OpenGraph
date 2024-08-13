@@ -6,6 +6,7 @@ import pickle
 import Exp_Utils.TimeLogger as logger
 from Exp_Utils.TimeLogger import log
 from Exp_Utils.Emailer import SendMail
+from Utils import descs
 
 class HierarchicalInstanceNumberEstimator(DataGenAgent):
     def __init__(self, entity_tree_root, total_num, depth, initial_entity, scenario_desc):
@@ -105,10 +106,10 @@ class HierarchicalInstanceNumberEstimator(DataGenAgent):
             pickle.dump(self.entity_tree_root, fs)
 
 
-scenario = 'e-commerce platform like Amazon'
-initial_entity = 'products'
-total_num = 200000
-depth = 5
+# scenario = 'e-commerce platform like Amazon'
+# initial_entity = 'products'
+# total_num = 200000
+# depth = 5
 
 # scenario = 'published paper list of top AI conferences'
 # initial_entity = 'deep learning papers'
@@ -120,13 +121,19 @@ depth = 5
 # total_num = 30000
 # depth = 5
 
+# initial_entity = 'ideology'
+# scenario = "people's political ideologies"
+# total_num = 30000
+# depth = 3
+
 # scenario = 'book rating platform'
 # initial_entity = 'books'
 # total_num = 30000
 # depth = 5
 
 # load entities
-file = os.path.join('gen_results/', '{entity}_{scenario}.txt'.format(entity=initial_entity, scenario=scenario))
+file = os.path.join('gen_results/', '{entity}_{scenario}.txt'.format(entity=descs["initial_entity"], 
+                                                                     scenario=descs["scenario_desc"]))
 entity_lines = []
 with open(file, 'r') as fs:
     for line in fs:
@@ -134,5 +141,7 @@ with open(file, 'r') as fs:
 entity_tree_constructer = EntityTreeConstructer(entity_lines)
 entity_tree_root = entity_tree_constructer.root
 
-estimator = HierarchicalInstanceNumberEstimator(entity_tree_root, total_num=total_num, depth=depth, initial_entity=initial_entity, scenario_desc=scenario)
+estimator = HierarchicalInstanceNumberEstimator(entity_tree_root, total_num=descs["total_num"],
+                                                depth=descs["depth"], initial_entity=descs["initial_entity"],
+                                                scenario_desc=descs["scenario_desc"])
 estimator.run()

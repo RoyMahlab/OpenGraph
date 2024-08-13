@@ -2,7 +2,8 @@ import pickle
 import os
 from Utils import DataGenAgent
 from Exp_Utils.TimeLogger import log
-
+from pathlib import Path
+from Utils import descs, check_and_create_dirs
 def load_item_list(item_file, entity_file, item_num):
     if not os.path.exists(item_file):
         with open(entity_file, 'rb') as fs:
@@ -16,34 +17,41 @@ def load_item_list(item_file, entity_file, item_num):
             item_list = pickle.load(fs)
     return item_list
 
-descs = {
-    'data_name': 'gen_data_venues',
-    'scenario_desc': 'venue rating platform like yelp',
-    'human_role': 'user',
-    'interaction_verb': 'interact',
-    'initial_entity': 'business venues',
-}
-descs = {
-    'data_name': 'gen_data_books',
-    'scenario_desc': 'book rating platform',
-    'human_role': 'user',
-    'interaction_verb': 'interact',
-    'initial_entity': 'books',
-}
-descs = {
-    'data_name': 'gen_data_ai_papers',
-    'scenario_desc': 'published paper list of top AI conferences',
-    'human_role': 'user',
-    'interaction_verb': 'interact',
-    'initial_entity': 'deep learning papers',
-}
-descs = {
-    'data_name': 'gen_data_ecommerce',
-    'scenario_desc': 'e-commerce platform like Amazon',
-    'human_role': 'user',
-    'interaction_verb': 'interact',
-    'initial_entity': 'products',
-}
+# descs = {
+#     'data_name': 'gen_data_venues',
+#     'scenario_desc': 'venue rating platform like yelp',
+#     'human_role': 'user',
+#     'interaction_verb': 'interact',
+#     'initial_entity': 'business venues',
+# }
+# descs = {
+#     'data_name': 'gen_data_books',
+#     'scenario_desc': 'book rating platform',
+#     'human_role': 'user',
+#     'interaction_verb': 'interact',
+#     'initial_entity': 'books',
+# }
+# descs = {
+#     'data_name': 'gen_data_ai_papers',
+#     'scenario_desc': 'published paper list of top AI conferences',
+#     'human_role': 'user',
+#     'interaction_verb': 'interact',
+#     'initial_entity': 'deep learning papers',
+# }
+# descs = {
+#     'data_name': 'gen_data_ecommerce',
+#     'scenario_desc': 'e-commerce platform like Amazon',
+#     'human_role': 'user',
+#     'interaction_verb': 'interact',
+#     'initial_entity': 'products',
+# }
+# descs = {
+#     'data_name': 'gen_data_political_opinions',
+#     'scenario_desc': "people's political ideologies",
+#     'human_role': 'user',
+#     'interaction_verb': 'interact',
+#     'initial_entity': 'ideology',
+# }
 file_root = 'gen_results/datasets/{data_name}/'.format(data_name=descs['data_name'])
 entity_file = 'gen_results/tree_wInstanceNum_{initial_entity}_{scenario}.pkl'.format(initial_entity=descs['initial_entity'], scenario=descs['scenario_desc'])
 embed_file = file_root + 'embedding_dict.pkl'
@@ -61,5 +69,6 @@ for i, item in enumerate(item_list):
     log('{idx} / {tot}'.format(idx=i, tot=len(item_list)))
     embedding = agent.openai_embedding(item)
     embedding_dict[item] = embedding
+check_and_create_dirs(file_root)
 with open(embed_file, 'wb') as fs:
     pickle.dump(embedding_dict, fs)

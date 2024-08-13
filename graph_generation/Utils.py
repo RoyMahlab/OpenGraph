@@ -7,8 +7,9 @@ import Exp_Utils.TimeLogger as logger
 from Exp_Utils.TimeLogger import log
 from Exp_Utils.Emailer import SendMail
 import time
+from pathlib import Path
 
-openai.api_key = "xx-xxxxxx"
+openai.api_key = ""
 
 class DataGenAgent:
     def __init__(self):
@@ -175,3 +176,20 @@ class EntityTreeConstructer:
                 print(str(e), ':', entity_line)
                 continue
             self.add_node(self.root, descriptions, cur=1)
+            
+def check_and_create_dirs(path:str):
+    path = Path(path)
+    if not path.exists():
+        path.mkdir(parents=True, exist_ok=True)
+        print(f"Directories leading to '{path}' have been created.")
+    else:
+        print(f"The path '{path}' already exists.")
+descs = {
+    'data_name': 'gen_data_ai_papers',
+    'scenario_desc': "published paper list of top AI conferences",
+    'initial_entity': 'deep learning papers',
+    'human_role': 'user',
+    'interaction_verb': 'interact',
+    'depth': 3,
+    'total_num': 30000
+}
