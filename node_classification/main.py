@@ -1,6 +1,8 @@
 import torch as t
 from torch import nn
 import Utils.TimeLogger as logger
+import wandb
+import torch_geometric
 from Utils.TimeLogger import log
 from params import args
 from model import OpenGraph, ALRS
@@ -61,7 +63,8 @@ class Exp:
             for key in res_summary:
                 res_summary[key] /= times
             log(self.make_print('AVG', args.epoch, res_summary, False, handler.data_name))
-        self.save_history()
+            if args.use_wandb:
+                wandb.log({f"{handler.data_name}_AvgAcc": res_summary['Acc']}, step=args.epoch)
 
     def add_res_to_summary(self, summary, res):
         for key in res:
@@ -163,6 +166,7 @@ class Exp:
         log('Model Loaded')
 
 if __name__ == '__main__':
+    torch_geometric.seed_everything(args.seed)
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     if len(args.gpu.split(',')) > 1:
         args.devices = ['cuda:0', 'cuda:1']

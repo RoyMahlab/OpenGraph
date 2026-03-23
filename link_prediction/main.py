@@ -1,9 +1,11 @@
 import torch as t
 from torch import nn
+import wandb
 import Utils.TimeLogger as logger
 from Utils.TimeLogger import log
 from params import args
 from model import OpenGraph, ALRS
+import torch_geometric
 from data_handler import DataHandler, MultiDataHandler
 import numpy as np
 import pickle
@@ -50,6 +52,8 @@ class Exp:
             tst_flag = (ep % args.tst_epoch == 0)
             reses = self.train_epoch()
             log(self.make_print('Train', ep, reses, tst_flag))
+            if args.use_wandb:
+                wandb.log({'TrainLoss': reses['Loss'], 'TrainPreLoss': reses['preLoss']}, step=ep)
             if ep % 1 == 0:
                 self.multi_handler.remake_initial_projections()
             if tst_flag:
@@ -67,11 +71,15 @@ class Exp:
             for i in range(times):
                 reses = self.test_epoch(handler.tst_loader, handler)
                 log(self.make_print('Test', args.epoch, reses, False, handler.data_name))
+                if args.use_wandb:
+                    wandb.log({f'{handler.data_name}_TestRecall': reses['Recall'], f'{handler.data_name}_TestNDCG': reses['NDCG']}, step=i)
                 self.add_res_to_summary(res_summary, reses)
                 self.multi_handler.remake_initial_projections()
             for key in res_summary:
                 res_summary[key] /= times
             log(self.make_print('AVG', args.epoch, res_summary, False, handler.data_name))
+            if args.use_wandb:
+                wandb.log({f'{handler.data_name}_AvgRecall': res_summary['Recall'], f'{handler.data_name}_AvgNDCG': res_summary['NDCG']}, step=args.epoch)
             print(time.time() - st)
         self.save_history()
 
@@ -228,6 +236,7 @@ class Exp:
         log('Model Loaded')
 
 if __name__ == '__main__':
+    torch_geometric.seed_everything(args.seed)
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     if len(args.gpu.split(',')) > 1:
         args.devices = ['cuda:0', 'cuda:1']
@@ -239,7 +248,7 @@ if __name__ == '__main__':
 
     log('Start')
     trn_datasets = ['gen1']
-    tst_datasets = ['ml1m', 'ml10m', 'collab']
+    tst_datasets = ['ml1m', 'ml10m', 'collab', 'ddi', 'amazon-book']
 
     # trn_datasets = ['gen2']
     # tst_datasets = ['ddi']

@@ -1,5 +1,5 @@
 import argparse
-
+import wandb
 def parse_args():
     parser = argparse.ArgumentParser(description='Model Parameters')
     parser.add_argument('--lr', default=1e-4, type=float, help='learning rate')
@@ -41,5 +41,15 @@ def parse_args():
     parser.add_argument('--anchor', default=256, type=int, help='number of anchor nodes in the compressed graph transformer')
     parser.add_argument('--pred_iter', default=1, type=int, help='number of prediction iterations')
     parser.add_argument('--proj_trn_steps', default=10, type=int, help='number of training steps for one initial projection')
+
+    parser.add_argument('--seed', default=0, type=int, help='random seed')
+
+    parser.add_argument('--use_wandb', default=0, type=int, help='indicating whether to use Weights & Biases')
+    parser.add_argument('--wandb_project', default='OpenGraph', type=str, help='Weights & Biases project name')
+    parser.add_argument('--wandb_group', default='Baseline', type=str, help='Weights & Biases group name')
+    parser.add_argument('--wandb_name', default='Exp Name', type=str, help='Weights & Biases run name')
     return parser.parse_args()
+
 args = parse_args()
+if args.use_wandb:
+    wandb.init(project=args.wandb_project, group=args.wandb_group, name=args.wandb_name, config=args)

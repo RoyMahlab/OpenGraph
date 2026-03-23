@@ -139,6 +139,7 @@ class GTLayer(nn.Module):
     
     def forward(self, embeds):
         anchor_embeds = self._pick_anchors(embeds)
+        # TODO: possible integration point, take embeds and prompt data and connect.
         _anchor_embeds, _ = self.multi_head_attention(anchor_embeds, embeds, embeds)
         anchor_embeds = _anchor_embeds + anchor_embeds
         _embeds, _ = self.multi_head_attention(embeds, anchor_embeds, anchor_embeds, need_weights=False)
